@@ -1,0 +1,50 @@
+/************************************************
+ * Interface description for integer sequence.
+ ************************************************/
+
+#ifndef __IntegerSequence_idl__
+#define __IntegerSequence_idl__
+ 
+module demo {
+
+	/** Maximal size of a batch query. */
+	const short MAX_QUERY_SIZE = 100;
+
+	/** Possible types of a service response to a request. */
+	enum ResponseType {
+		/** Response is a 32-bit signed integer. */
+		t_int,
+		/** Response is a string. */
+		t_string,
+		/** Response is a message for an error that occured performing the request. */
+		t_error
+	};
+	
+	/** Response to a request to get a single memeber of the sequence. */
+	union Response switch(ResponseType) {
+		case t_int: long intVal;
+		case t_string: string stringVal;
+		case t_error: string message;
+	};
+	
+	/** List of indices in a batch request. */
+	typedef sequence<long, MAX_QUERY_SIZE> IndexList;
+	/** List of responses for a batch request. */
+	typedef sequence<Response, MAX_QUERY_SIZE> ResponseList;
+
+	interface IntegerSequence {
+		/** Human-readable name of the sequence. */
+		readonly attribute string name;
+		/** Short description of the sequence. */
+		readonly attribute string description;
+		/** Maximum supported index of the sequence. */
+		readonly attribute long maxIndex;
+
+		/** Gets a single member of the sequence. */
+		Response number(in long index);
+		/** Get several sequence members in a batch request. */
+		ResponseList numbers(in IndexList indices);
+	};
+};
+
+#endif

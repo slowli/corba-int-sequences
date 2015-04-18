@@ -1,0 +1,31 @@
+##################################################
+# Configuration settings for make.
+##################################################
+
+BASE=IntegerSequence
+MODULE=demo
+IDL=../$(BASE).idl
+
+# IDL Compilers
+IDLC_CS=mono IDLToCLSCompiler.exe
+IDLC_JAVA=idlj
+IDLC_PY=omniidl -bpython
+
+# Python stubs for omniorb 3.x and omniorb 4.x are incompatible; 
+# we have to determine the version and the generate stubs accordingly
+OMNIORBPY_VER:=$(shell python -c 'import _omnipy; print _omnipy.__version__[0]')
+ifneq ($(OMNIORBPY_VER),3)
+ifneq ($(OMNIORBPY_VER),4)
+OMNIORBPY_VER=4
+endif
+endif
+
+# Program compilers
+CSC=mcs
+JAVAC=javac
+JAR=jar
+
+# Installation directory
+# ROOT_DIR is a relative path to the root project directory 
+# defined in each of makefiles
+BIN=$(ROOT_DIR)/bin

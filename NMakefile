@@ -1,0 +1,37 @@
+##################################################
+# Top level Makefile for CORBA demo (nmake).
+##################################################
+
+ROOT_DIR=.
+include NMakevars
+
+build: build-java build-python build-cs
+
+build-java:
+	@echo Building Java...
+	cd java && $(MAKE) /f NMakefile build && cd ..
+	
+build-python:
+	@echo Building Python...
+	cd python && $(MAKE) /f NMakefile build && cd ..
+	
+build-cs:
+	@echo Building C#...
+	cd cs && $(MAKE) /f NMakefile build && cd ..	
+	
+install: build
+	@echo Installing Java...
+	cd java && $(MAKE) /f NMakefile install && cd ..
+	@echo Installing Python...
+	cd python && $(MAKE) /f NMakefile install && cd ..
+	@echo Installing C#...
+	cd cs && $(MAKE) /f NMakefile install && cd ..
+	
+clean:
+	cd java && $(MAKE) /f NMakefile clean && cd ..
+	cd python && $(MAKE) /f NMakefile clean && cd ..
+	cd cs && $(MAKE) /f NMakefile clean && cd ..
+	
+uninstall:
+	del /q $(BIN)\*
+	for /d %%d in ($(BIN)\*) do rmdir /s /q %%d

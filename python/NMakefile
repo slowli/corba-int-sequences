@@ -1,0 +1,38 @@
+##################################################
+# Makefile for Python client and server.
+##################################################
+
+ROOT_DIR=..
+include ..\NMakevars
+
+IMPL_MODULE=pyimpl
+IDL_OUT_DIR=$(IMPL_MODULE)\omni$(OMNIORBPY_VER)
+IDL_OUT=$(IDL_OUT_DIR)\$(BASE)_idl.py
+
+MODULE_DIRS=$(MODULE) $(MODULE)__POA
+
+CLIENT=client-py.bat
+SERVER=server-py.bat
+
+build: idl
+
+idl: $(IDL_OUT) 
+
+# Directories created by omniidl are not needed due to a hack
+$(IDL_OUT): $(IDL)
+	$(IDLC_PY) -Wbstubs=$(IMPL_MODULE).omni$(OMNIORBPY_VER) $(IDL)
+	for %f in ( $(MODULE_DIRS) ) do ( if exist %f rmdir /q /s %f )
+
+clean:
+	if exist $(IMPL_MODULE)\*.pyc del /q $(IMPL_MODULE)\*.pyc
+	if exist $(IMPL_MODULE)\omni*\*.pyc del /q $(IMPL_MODULE)\omni*\*.pyc
+	if exist $(IDL_OUT) del /q $(IDL_OUT)
+
+install: build $(IMPL_MODULE)\*.py
+	if not exist $(BIN)\$(IMPL_MODULE) mkdir $(BIN)\$(IMPL_MODULE)
+	copy /y $(IMPL_MODULE)\*.py $(BIN)\$(IMPL_MODULE)
+	if not exist $(BIN)\$(IDL_OUT_DIR) mkdir $(BIN)\$(IDL_OUT_DIR)
+	copy /y $(IDL_OUT) $(BIN)\$(IDL_OUT)
+	copy /y nul $(BIN)\$(IDL_OUT_DIR)\__init__.py
+	echo @python -m $(IMPL_MODULE).client %* > $(BIN)\$(CLIENT)
+	echo @python -m $(IMPL_MODULE).server %* > $(BIN)\$(SERVER)
