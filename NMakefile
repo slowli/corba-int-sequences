@@ -31,7 +31,3 @@ clean:
 	cd java && $(MAKE) /f NMakefile clean && cd ..
 	cd python && $(MAKE) /f NMakefile clean && cd ..
 	cd cs && $(MAKE) /f NMakefile clean && cd ..
-	
-uninstall:
-	del /q $(BIN)\*
-	for /d %%d in ($(BIN)\*) do rmdir /s /q %%d

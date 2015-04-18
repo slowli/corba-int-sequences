@@ -33,6 +33,3 @@ clean:
 	cd java && $(MAKE) clean && cd ..
 	cd python && $(MAKE) clean && cd ..
 	cd cs && $(MAKE) clean && cd ..
-	
-uninstall:
-	rm -rf $(BIN)/*

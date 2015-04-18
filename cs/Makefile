@@ -1,3 +1,7 @@
+##################################################
+# Makefile for C# client and server.
+##################################################
+
 ROOT_DIR=..
 include $(ROOT_DIR)/Makevars
 
