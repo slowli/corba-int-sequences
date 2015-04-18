@@ -7,6 +7,9 @@ import demo.Response;
 import demo.impl.IntegerSequenceImpl;
 import demo.impl.Name;
 
+/**
+ * Prime numbers with the specified bit length.
+ */
 public class RandomPrimeImpl extends IntegerSequenceImpl  {
 
 	public static final String NAME = "Random primes (Java)";
@@ -32,7 +35,7 @@ public class RandomPrimeImpl extends IntegerSequenceImpl  {
 	}
 
 	@Override
-	public Name nameForCORBA() {
+	public Name corbaName() {
 		return new Name("rnd-prime", "java");
 	}
 }

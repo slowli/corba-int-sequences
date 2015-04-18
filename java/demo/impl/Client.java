@@ -43,8 +43,8 @@ public final class Client {
 	public static void printInfo(demo.IntegerSequenceOperations sequence, Name corbaName) {
 		System.out.format("Sequence ID: %s, kind: %s\n", corbaName.id, corbaName.kind);
 		System.out.println("Name: " + sequence.name());
-		System.out.println("Description:\n" + sequence.description());
 		System.out.println("Maximal supported index: " + sequence.maxIndex());
+		System.out.println("Description:\n" + sequence.description());
 	}
 	
 	public static void printErroneousInfo(ServiceException e, Name corbaName) {
@@ -151,6 +151,17 @@ public final class Client {
 	}
 	
 	/**
+	 * Checks if the CORBA name of an integer sequence matches the one specified by the user.
+	 * 
+	 * @param name
+	 *    CORBA name to check
+	 * @return
+	 */
+	private boolean matches(Name name) {
+		return name.id.equals(this.sequenceName) || name.toString().equals(this.sequenceName);
+	}
+	
+	/**
 	 * Retrieves members from an integer sequence. Both sequence and members are determined
 	 * by parsing the arguments supplied to the client.
 	 */
@@ -159,7 +170,7 @@ public final class Client {
 		
 		IntegerSequenceProxy proxy = null;
 		for (Name name : dir.serviceNames()) {
-			if (name.matches(this.sequenceName)) {
+			if (this.matches(name)) {
 				try {
 					proxy = new IntegerSequenceProxy(dir.resolve(name), name, shortenNumbers);
 					break;

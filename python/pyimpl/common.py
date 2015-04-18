@@ -19,6 +19,8 @@ Sequence ID: {id}, kind: {kind}
 {error}"""
 
 def cached(fn, hash_args=lambda *args: hash(args)):
+    """ Caches results of function calls. """
+    
     _cache = dict()
 
     def cached_fn(*args):
@@ -28,9 +30,11 @@ def cached(fn, hash_args=lambda *args: hash(args)):
         return _cache[hash]
     return cached_fn
 
-class ArgumentError(ValueError): pass
+class ArgumentError(ValueError):
+    """ Exception thrown when there is a problem parsing program arguments. """
 
 class ServiceError(RuntimeError):
+    """ Exception thrown to indicate a CORBA-related problem. """
 
     def __init__(self, message, cause=None):
         RuntimeError.__init__(self, message)
@@ -51,6 +55,8 @@ class Name(object):
         return [ NameComponent(self.id, self.kind) ]
 
 class ServiceDir(object):
+
+    """ Directory (context) within CORBA naming space containing services with a specific type. """
 
     def __init__(self, dir_name, create=False):
         self.create = create
@@ -75,6 +81,9 @@ class ServiceDir(object):
     @property
     @cached
     def service_dir(self):
+        """ Directory that contains services. If the corresponding option is set,
+        the directory is created provided it doesn't exist before the call. """
+        
         ns = self.name_service
         try:
             name = ns.to_name(self.dir_name)
@@ -110,6 +119,8 @@ class ServiceDir(object):
             raise ServiceError("Failed to list services", ex)
 
     def get(self, name, obj_type):
+        """ Resolves a name to a service. """
+
         try:
             obj = self.service_dir.resolve(name.components)
             obj = obj._narrow(obj_type)
@@ -119,10 +130,14 @@ class ServiceDir(object):
             raise ServiceError("Failed to access service name {0}".format(name), ex)
 
     def bind(self, name, obj):
+        """ Binds or rebinds an object as a child of a service directory. """
+        
         print "Binding implementation '{1}' to name {0}".format(name, obj)
         self.service_dir.rebind(name.components, obj._this())
 
     def unbind_all(self, filter=lambda: True):
+        """ Unbinds all services with the name matching the specified predicate. """
+        
         for n in self.service_names:
             if filter(n):
                 print "Unbinding name {0}".format(n)

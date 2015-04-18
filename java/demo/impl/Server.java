@@ -64,7 +64,7 @@ public class Server {
 		System.out.println("List of implementations hosted by this server:");
 		for (IntegerSequenceImpl impl : this.getImplementations()) {
 			System.out.println(DELIMITER);
-			Client.printInfo(impl, impl.nameForCORBA());
+			Client.printInfo(impl, impl.corbaName());
 		}
 	}
 	
@@ -76,7 +76,7 @@ public class Server {
 			}
 		});
 		for (IntegerSequenceImpl impl : this.getImplementations()) {
-			this.dir.bind(impl.nameForCORBA(), impl);
+			this.dir.bind(impl.corbaName(), impl);
 		}
 		
 		System.out.println("Ready for incoming requests...");

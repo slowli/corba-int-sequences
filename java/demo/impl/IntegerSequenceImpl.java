@@ -7,6 +7,8 @@ import demo.Response;
 
 /**
  * The generic implementation of the integer sequence service.
+ * When retrieving members of the sequence, this implementation prints information 
+ * about requested indices and timings.
  */
 public abstract class IntegerSequenceImpl extends demo.IntegerSequencePOA {
 
@@ -77,7 +79,22 @@ public abstract class IntegerSequenceImpl extends demo.IntegerSequencePOA {
 		return responses;
 	}
 	
+	/**
+	 * Computes a member of this integer sequence.
+	 * 
+	 * @param index
+	 *    0-based index of the member
+	 * @return
+	 *    number wrapped in the response container
+	 * 
+	 * @throws Exception
+	 */
 	protected abstract Response compute(int index) throws Exception;
 	
-	public abstract Name nameForCORBA();
+	/**
+	 * Gets the name of this sequence for CORBA naming service.
+	 * 
+	 * @return
+	 */
+	public abstract Name corbaName();
 }

@@ -5,6 +5,8 @@ namespace demo.impl {
 
 	/// <summary>
 	/// The generic implementation of the integer sequence service.
+	/// When retrieving members of the sequence, this implementation prints information 
+	/// about requested indices and timings.
 	/// </summary>
 	[SupportedInterface(typeof(demo.IntegerSequence))]
 	public abstract class IntegerSequenceImpl : MarshalByRefObject, demo.IntegerSequence {

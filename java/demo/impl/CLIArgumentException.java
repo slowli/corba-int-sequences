@@ -10,6 +10,12 @@ public class CLIArgumentException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates a new exception with the specified message.
+	 * 
+	 * @param message
+	 *    error message
+	 */
 	public CLIArgumentException(String message) {
 		super(message);
 	}

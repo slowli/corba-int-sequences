@@ -1,5 +1,5 @@
 
-"""Integer sequences with CORBA - server Python script"""
+"""Integer sequences with CORBA - sequence implementations"""
 
 import math
 
@@ -58,8 +58,8 @@ def fibonacci(i):
 
 fibonacci.name = "Fibonacci numbers (Python)"
 fibonacci.max_index = 2000000
-fibonacci.description = \
-"""Fibonacci numbers, defined by equalities
+fibonacci.description = """\
+Fibonacci numbers, defined by equalities
     fib(i) = fib(i-1) + fib(i-2), fib(0) = 0, fib(1) = 1.
 This implementation in Python uses 2x2 matrices and fast exponentation 
 for calculations.
@@ -70,8 +70,8 @@ def pow2(i): return 1L << i
 
 pow2.name = "Powers of 2 (Python)"
 pow2.max_index = 1000000
-pow2.description = \
-"""Powers of two, implemented with the bit shift operation:
+pow2.description = """\
+Powers of two, implemented with the bit shift operation:
     pow2(i) = 1L << i."""
 
 def pow3_naive(i):
@@ -81,14 +81,14 @@ def pow3_naive(i):
 
 pow3_naive.name = "Powers of 3, naive (Python)"
 pow3_naive.max_index = 1000000
-pow3_naive.description = \
-"""Powers of three, implemented with the repeated multiplications."""
+pow3_naive.description = """\
+Powers of three, implemented with the repeated multiplications."""
 
 pow3 = effective_pow(3L, identity=1L)
 pow3.name = "Powers of 3 (Python)"
 pow3.max_index = 1000000
-pow3.description = \
-"""Powers of three, implemented with the fast exponentation."""
+pow3.description = """\
+Powers of three, implemented with the fast exponentation."""
 
 class primes_seq(object):
     

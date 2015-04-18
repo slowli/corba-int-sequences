@@ -21,20 +21,29 @@ import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.Servant;
 
 /**
+ * Directory (context) within CORBA naming space containing services with a specific type.
+ * 
+ * @param T
+ *    type of services
  */
 public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 
+	/**
+	 * Filters services by their name.
+	 */
 	public static interface NameFilter {
 		
+		/**
+		 * Checks if the service name matches certain criteria.
+		 * 
+		 * @param name 
+		 *    CORBA name to check
+		 * @return
+		 */
 		boolean matches(Name name);
 	}
 	
-	// TODO reflection?
-	public static interface Converter<T extends org.omg.CORBA.Object> {
-	
-		T narrow(org.omg.CORBA.Object obj);
-	}
-
+	/** Maximal number of services in the directory. */
 	private static final int MAX_SERVICES = 100;
 	
 	/** Create directory if it is absent? */
@@ -46,19 +55,8 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 	/** Name of the directory within the CORBA name service. */
 	public final String directoryName;
 	
-	//private final Converter<T> converter;
-	
+	/** Method to narrow CORBA objects. */
 	private final Method narrowMethod;
-	
-	@SuppressWarnings("unchecked")
-	private T narrow(org.omg.CORBA.Object obj) {
-		try {
-			return (T) this.narrowMethod.invoke(null, obj);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// Should not happen
-			throw new RuntimeException("Could not narrow object");
-		}
-	}
 	
 	private NamingContextExt nameService = null;
 	
@@ -70,7 +68,6 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 		this.orb = orb;
 		this.createIfAbsent = createIfNeeded;
 		this.directoryName = directoryName;
-		//this.converter = converter;
 		
 		final Class<?> objectCls = org.omg.CORBA.Object.class;
 		try {
@@ -80,6 +77,23 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 			}
 		} catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException("Invalid helper class: " + helper);
+		}
+	}
+	
+	/**
+	 * Narrows a generic CORBA object into a service.  
+	 * 
+	 * @param obj
+	 *    CORBA object to narrow
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private T narrow(org.omg.CORBA.Object obj) {
+		try {
+			return (T) this.narrowMethod.invoke(null, obj);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			// Should not happen
+			throw new RuntimeException("Could not narrow object");
 		}
 	}
 	
@@ -197,7 +211,7 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 		NamingContextExt dir = this.serviceDir();
 		try {
 			org.omg.CORBA.Object obj = dir.resolve(name.toComponents());
-			T narrowedObj = this.narrow(obj);//this.converter.narrow(obj);
+			T narrowedObj = this.narrow(obj);
 			narrowedObj._non_existent();
 			return narrowedObj;
 		} catch (UserException | SystemException e) {
@@ -220,7 +234,7 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 		
 		try {
 			org.omg.CORBA.Object obj = this.rootPOA().servant_to_reference(servant);
-			obj = this.narrow(obj);//this.converter.narrow(obj);
+			obj = this.narrow(obj);
 			this.serviceDir().rebind(name.toComponents(), obj);
 		} catch (UserException | SystemException e) {
 			throw new ServiceException("Failed to bind implementation", e);
@@ -229,6 +243,9 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 	
 	/**
 	 * Unbinds all services with the name matching the specified predicate.
+	 * 
+	 * @param filter
+	 *    predicate to filter services
 	 *
 	 * @throws ServiceException
 	 *    if a CORBA-related error occurs during ope

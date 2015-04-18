@@ -174,7 +174,7 @@ namespace demo.impl {
 		private NamingContextExt _DirContext = null;
 
 		/// <summary>
-		/// Directory that contains services. If tools are in the server mode,
+		/// Directory that contains services. If the corresponding option is set,
 		/// the directory is created provided it doesn't exist before the call.
 		/// </summary>
 		/// <exception cref="ServiceException">

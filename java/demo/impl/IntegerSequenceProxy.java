@@ -9,7 +9,8 @@ import demo.Response;
 import demo.ResponseType;
 
 /**
- * Proxy for an integer sequence that addresses requests to the remote CORBA service.
+ * Proxy for integer sequence service. When accessing the service,
+ * proxy prints information about requests, received data, and timings.
  */
 public class IntegerSequenceProxy implements IntegerSequenceOperations {
 

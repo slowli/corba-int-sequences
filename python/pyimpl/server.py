@@ -12,7 +12,7 @@ from demo import Response
 
 
 class IntegerSequence_impl(demo__POA.IntegerSequence):
-    """ Generic implementation of a number service"""
+    """ Generic implementation of a number service. """
 
     def __init__(self, fn, name=None, max_index=None, description=None):
         self._name = name if not name is None else fn.name

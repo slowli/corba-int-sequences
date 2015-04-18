@@ -15,22 +15,14 @@ public class Name {
 	
 	public final String kind;
 	
-	final NameComponent component;
-	
 	public Name(String id, String kind) {
 		this.id = id;
 		this.kind = kind;
-		this.component = null;
 	}
 	
 	Name(NameComponent component) {
 		this.id = component.id;
 		this.kind = component.kind;
-		this.component = component;
-	}
-	
-	public boolean matches(String pattern) {
-		return pattern.equals(id) || pattern.equals(this.toString());
 	}
 	
 	public NameComponent[] toComponents() {

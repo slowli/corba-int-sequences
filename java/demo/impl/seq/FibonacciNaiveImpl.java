@@ -6,6 +6,9 @@ import demo.Response;
 import demo.impl.IntegerSequenceImpl;
 import demo.impl.Name;
 
+/**
+ * Fibonacci numbers implemented using the definition.
+ */
 public class FibonacciNaiveImpl extends IntegerSequenceImpl {
 
 	public static final String NAME = "Fibonacci numbers, naive (Java)";
@@ -38,7 +41,7 @@ public class FibonacciNaiveImpl extends IntegerSequenceImpl {
 	}
 
 	@Override
-	public Name nameForCORBA() {
+	public Name corbaName() {
 		return new Name("fib", "naive-java");
 	}
 }
