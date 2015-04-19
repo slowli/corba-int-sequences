@@ -75,22 +75,23 @@ Options:
         Print this help message and exit."""
 
     def __init__(self, args):
-        self.process_args(args)
+        self.mode = self.process_args(args)
 
     def process_args(self, args):
+        """ Processes command line arguments. Returns working mode for the program. """
+        
         argi = 1
         while (argi < len(args)):
             arg = args[argi]
             argi += 1
             
             if (arg == '--help'):
-                print self.USAGE
-                sys.exit(0)
+                return 'help'
             elif (arg == '--list'):
-                self.list_implementations()
-                sys.exit(0)
+                return 'list'
             else:
                 raise ArgumentError("Unknown argument: {0}.".format(arg))
+        return 'run'
 
     @property
     @cached
@@ -119,7 +120,9 @@ Options:
                 descr=impl._get_description(), \
                 max=impl._get_maxIndex())
 
-    def run(self):
+    def run_impl(self):
+        """ Runs integer sequence implementations. """
+        
         # Get object request brocker and POA manager
         directory = ServiceDir("integer-seq", True)
         directory.unbind_all(lambda name: name.kind.endswith("py"))
@@ -134,6 +137,16 @@ Options:
         poa_manager.activate()
         print "Ready for incoming requests..."
         directory.orb.run()
+        
+    def run(self):
+        """ Runs the server program. """
+        
+        if self.mode == 'run':
+            self.run_impl()
+        elif self.mode == 'list':
+            self.list_implementations()
+        elif self.mode == 'help':
+            print self.USAGE
 
 if __name__ == "__main__":
     try:

@@ -104,10 +104,10 @@ Examples:
         self.shorten = False
 
         self.directory = ServiceDir("integer-seq", False)
-        self.process_args(args)
+        self.mode = self.process_args(args)
 
     def process_args(self, args):
-        """ Processes command line arguments """
+        """ Processes command line arguments. Returns working mode for the program. """
 
         if len(args) == 1:
             raise ArgumentError("No arguments specified.")
@@ -123,9 +123,9 @@ Examples:
             elif arg == '--short':
                 self.shorten = True
             elif arg == '--help':
-                print self.USAGE; sys.exit(0)
+                return 'help'
             elif arg == '--list':
-                self.list_services(); sys.exit(0)
+                return 'list'
             else:
                 raise ArgumentError("Unknown argument: {0}.".format(arg))
             argi += 1
@@ -139,6 +139,7 @@ Examples:
         if (len(self.indices) > demo.MAX_QUERY_SIZE):
             raise ArgumentError("Too many indices specified. Specify no more than {0}" \
                     .format(demo.MAX_QUERY_SIZE))
+        return 'query'
 
     def list_services(self):
         names = self.directory.service_names
@@ -156,7 +157,9 @@ Examples:
                 print ERROR_TEMPLATE.format(id=name.id, kind=name.kind, \
                     error=ex.message)
 
-    def run(self):
+    def query(self):
+        """ Requests members from a remote integer sequence service. """
+        
         print "Getting service by sequence name '{0}'...".format(self.service_name)
         
         names = self.directory.service_names
@@ -185,6 +188,16 @@ Examples:
         else:
             for i in self.indices: proxy.number(i)
 
+    def run(self):
+        """ Runs the client program. """
+        
+        if self.mode == 'query':
+            self.query()
+        elif self.mode == 'list':
+            self.list_services()
+        elif self.mode == 'help':
+            print self.USAGE
+
 
 if __name__ == "__main__":
     try:
@@ -193,9 +206,9 @@ if __name__ == "__main__":
     except ArgumentError, e:
         print e.message + "\nInvoke with `--help` option to get help."
         sys.exit(2)
-    except Exception, e:
+    except ServiceError, e:
         print "Error: " + e.message
-        if isinstance(e, ServiceError) and e.cause is not None:
+        if e.cause is not None:
             print "Cause: " + str(e.cause)
         sys.exit(1)
 

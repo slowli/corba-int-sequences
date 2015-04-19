@@ -10,6 +10,16 @@ import demo.impl.seq.RandomPrimeImpl;
 
 public class Server {
 
+	/** Working modes of the server application. */
+	private static enum Mode {
+		/** Run integer sequence implementations. */
+		RUN,
+		/** List implementations. */
+		LIST,
+		/** Print help message. */
+		HELP
+	}
+	
 	private static final String USAGE = 
 		"Usage: server [--list | --help]\n" +
 		"\n" +
@@ -26,9 +36,19 @@ public class Server {
 	/** Directory containing integer sequence services. */
 	private final IntegerSequenceDir dir;
 	
+	/** Working mode of the application. */
+	private Mode mode = Mode.RUN;
+	
+	/** Integer sequence implementations run by this server. */
+	private final List<IntegerSequenceImpl> implementations = new ArrayList<IntegerSequenceImpl>();
+	
 	public Server(String[] args) throws CLIArgumentException {
 		this.processArgs(args);
 		this.dir = new IntegerSequenceDir(true);
+		
+		this.implementations.add(new FibonacciImpl());
+		this.implementations.add(new FibonacciNaiveImpl());
+		this.implementations.add(new RandomPrimeImpl());
 		
 		// Turn off CORBA logging as it is rather tedious
 		final LogManager lman = LogManager.getLogManager();
@@ -41,46 +61,68 @@ public class Server {
 			final String arg = args[argi++];
 			
 			if (arg.equals("--list")) {
-				this.listImplementations();
-				System.exit(0);
+				this.mode = Mode.LIST;
+				return;
 			} else if (arg.equals("--help")) {
-				System.out.println(USAGE);
-				System.exit(0);
+				this.mode = Mode.HELP;
+				return;
 			} else {
 				throw new CLIArgumentException("Invalid argument: " + arg + ".");
 			}
 		}
 	}
 	
-	private List<IntegerSequenceImpl> getImplementations() {
-		List<IntegerSequenceImpl> implementations = new ArrayList<IntegerSequenceImpl>();
-		implementations.add(new FibonacciImpl());
-		implementations.add(new FibonacciNaiveImpl());
-		implementations.add(new RandomPrimeImpl());
-		return implementations;
-	}
-	
+	/**
+	 * Prints information about integer sequence implementations 
+	 * that are run by this server program.
+	 */
 	public void listImplementations() {
 		System.out.println("List of implementations hosted by this server:");
-		for (IntegerSequenceImpl impl : this.getImplementations()) {
+		for (IntegerSequenceImpl impl : this.implementations) {
 			System.out.println(DELIMITER);
 			Client.printInfo(impl, impl.corbaName());
 		}
 	}
 	
-	public void run() throws ServiceException {
+	/**
+	 * Runs integer sequence implementations.
+	 * 
+	 * @throws ServiceException
+	 *    if a CORBA-related error occurs during operation 
+	 */
+	private void runImplementations() throws ServiceException {
 		this.dir.unbindAll(new ServiceDirectory.NameFilter() {
-		
+			
 			public boolean matches(Name name) {
 				return name.kind.endsWith("java");
 			}
 		});
-		for (IntegerSequenceImpl impl : this.getImplementations()) {
+		for (IntegerSequenceImpl impl : this.implementations) {
 			this.dir.bind(impl.corbaName(), impl);
 		}
 		
 		System.out.println("Ready for incoming requests...");
 		Config.orb().run();
+	}
+	
+	/**
+	 * Runs the server program.
+	 * 
+	 * @throws ServiceException
+	 *    if a CORBA-related error occurs during operation
+	 */
+	public void run() throws ServiceException {
+		switch (this.mode) {
+			case RUN:
+				this.runImplementations();
+				return;
+			case LIST:
+				this.listImplementations();
+				return;
+			case HELP:
+				System.out.println(USAGE);
+				return;
+		}
 	}
 	
 	public static void main(String[] args) {

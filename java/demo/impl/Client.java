@@ -9,6 +9,16 @@ import org.omg.CORBA.SystemException;
 
 public final class Client {
 
+	/** Working modes of the client application. */
+	private static enum Mode {
+		/** Query an integer sequence implementation. */
+		QUERY,
+		/** List implementations. */
+		LIST,
+		/** Print help message. */
+		HELP
+	}
+	
 	private static final String USAGE =
 		"Usage: client [option...] (sequence-ID | service-ID) index index...\n" +
 		"       client (--list | --help)\n" +
@@ -51,6 +61,9 @@ public final class Client {
 		System.out.format("Sequence ID: %s, kind: %s\n", corbaName.id, corbaName.kind);
 		System.out.println(e.getMessage());
 	}
+	
+	/** Working mode of the application. */
+	private Mode mode = Mode.QUERY;
 
 	/** Name of the sequence or a particular implementation to work with. */
 	private String sequenceName = "";
@@ -67,7 +80,16 @@ public final class Client {
 	/** Directory containing integer sequence services. */
 	private final IntegerSequenceDir dir;
 	
-	public Client(String[] args) throws ServiceException, CLIArgumentException {
+	/**
+	 * Creates a client program and parses supplied command line arguments to determine
+	 * the course of action. 
+	 * 
+	 * @param args
+	 *    CLI arguments
+	 * @throws CLIArgumentException
+	 *    if an error occurs parsing arguments
+	 */
+	public Client(String[] args) throws CLIArgumentException {
 		this.dir = new IntegerSequenceDir(false);
 		
 		// Turn off CORBA logging as it is rather tedious
@@ -80,7 +102,7 @@ public final class Client {
 	/**
 	 * Processes arguments supplied to the program.
 	 */
-	public void processArgs(String[] args) throws CLIArgumentException, ServiceException {
+	public void processArgs(String[] args) throws CLIArgumentException {
 		if (args.length == 0) {
 			throw new CLIArgumentException("No arguments specified.");
 		}
@@ -90,17 +112,17 @@ public final class Client {
 			final String arg = args[argi];
 			
 			if (arg.equals("--seq")) {
-				batch = false;
+				this.batch = false;
 			} else if (arg.equals("--batch")) {
-				batch = true;
+				this.batch = true;
 			} else if (arg.equals("--short")) {
-				shortenNumbers = true;
+				this.shortenNumbers = true;
 			} else if (arg.equals("--list")) {
-				listServices();
-				System.exit(0);
+				this.mode = Mode.LIST;
+				return;
 			} else if (arg.equals("--help")) {
-				System.out.println(USAGE);
-				System.exit(0);
+				this.mode = Mode.HELP;
+				return;
 			} else {
 				throw new CLIArgumentException("Unknown argument: " + arg + ".");
 			}
@@ -162,10 +184,12 @@ public final class Client {
 	}
 	
 	/**
-	 * Retrieves members from an integer sequence. Both sequence and members are determined
-	 * by parsing the arguments supplied to the client.
+	 * Requests members from a remote integer sequence service.
+	 * 
+	 * @throws ServiceException
+	 *    if a CORBA-related error occurs during operation
 	 */
-	public void run() throws ServiceException {
+	private void querySequence() throws ServiceException {
 		System.out.format("Getting service by sequence name '%s'...\n", this.sequenceName);
 		
 		IntegerSequenceProxy proxy = null;
@@ -195,6 +219,26 @@ public final class Client {
 			}
 		} catch (SystemException e) {
 			throw new ServiceException("Error processing response", e);
+		}
+	}
+	
+	/**
+	 * Runs the server program.
+	 * 
+	 * @throws ServiceException
+	 *    if a CORBA-related error occurs during operation
+	 */
+	public void run() throws ServiceException {
+		switch (this.mode) {
+			case QUERY:
+				this.querySequence();
+				return;
+			case LIST:
+				this.listServices();
+				return;
+			case HELP:
+				System.out.println(USAGE);
+				return;
 		}
 	}
 
