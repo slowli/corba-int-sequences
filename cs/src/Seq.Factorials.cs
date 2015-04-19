@@ -4,6 +4,9 @@ using System;
 
 namespace demo.impl.seq {
 
+	/// <summary>
+	/// Factorials using recursive split.
+	/// </summary>
 	public class FactorialSeq : IntegerSequenceImpl {
 
 		public FactorialSeq() : base() {
@@ -73,6 +76,9 @@ This implementation in C# uses recursive splitting technique.";
 		}
 	}
 
+	/// <summary>
+	/// Slow straightforward implementation of factorials.
+	/// </summary>
 	public class NaiveFactorialSeq : IntegerSequenceImpl {
 
 		public NaiveFactorialSeq() : base() {

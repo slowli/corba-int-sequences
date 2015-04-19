@@ -102,6 +102,7 @@ namespace demo.impl {
 
 	/// <summary>
 	/// Directory (context) within CORBA name service containing services with the specified type.
+	/// This is where CORBA-related code is concentrated.
 	/// </summary>
 	/// <typeparam name="T">Type of services in the directory; it should be an interface 
 	/// created by translating IDL file</typeparam>
@@ -167,7 +168,7 @@ namespace demo.impl {
 					}
 				}
 
-				return _NameService;
+				return this._NameService;
 			}
 		}
 
@@ -209,7 +210,7 @@ namespace demo.impl {
 						}
 					}
 			
-					try{
+					try {
 						if (dir == null) dir = (NamingContextExt) NameService.resolve(name);
 					} catch (AbstractCORBASystemException e) {
 						throw new ServiceException("Failed to get services directory", e);
@@ -220,7 +221,7 @@ namespace demo.impl {
 					this._DirContext = dir;
 				}
 
-				return _DirContext;
+				return this._DirContext;
 			}
 		}
 
@@ -240,6 +241,7 @@ namespace demo.impl {
 				foreach (Binding binding in bindings) {
 					names.Add(new Name(binding.binding_name[0]));
 				}
+
 				return names;
 			}
 		}

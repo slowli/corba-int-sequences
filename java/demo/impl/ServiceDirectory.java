@@ -22,6 +22,7 @@ import org.omg.PortableServer.Servant;
 
 /**
  * Directory (context) within CORBA naming space containing services with a specific type.
+ * This is where CORBA-related code is concentrated.
  * 
  * @param T
  *    type of services
@@ -64,9 +65,24 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 	
 	private NamingContextExt serviceDir = null;
 	
-	public ServiceDirectory(ORB orb, String directoryName, Class<?> helper, boolean createIfNeeded) {
+	/**
+	 * Creates a service directory at the specified location.
+	 * 
+	 * @param orb
+	 *    object request broker to use for CORBA-related operations
+	 * @param directoryName
+	 *    name of the directory
+	 * @param helper
+	 *    helper class to narrow CORBA object references
+	 * @param createIfAbsent
+	 *    create directory if it is absent?
+	 * 
+	 * @throws IllegalArgumentException
+	 *    if helper class is invalid (does not have public static narrow method)
+	 */
+	public ServiceDirectory(ORB orb, String directoryName, Class<?> helper, boolean createIfAbsent) {
 		this.orb = orb;
-		this.createIfAbsent = createIfNeeded;
+		this.createIfAbsent = createIfAbsent;
 		this.directoryName = directoryName;
 		
 		final Class<?> objectCls = org.omg.CORBA.Object.class;
@@ -106,6 +122,9 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 	
 	/**
 	 * Returns name service to resolve names to remote object references.
+	 * 
+	 * @return
+	 *    name service object
 	 *
 	 * @throws ServiceException
 	 *    if a CORBA-related error occurs while getting the naming service
@@ -122,6 +141,15 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 		return this.nameService;
 	}
 	
+	/**
+	 * Returns root portable object adapter (POA) service to convert {@linkplain Servant servants}
+	 * to CORBA objects.
+	 * 
+	 * @return
+	 *    root POA service
+	 * @throws ServiceException
+	 *    if a CORBA-related error occurs while getting the POA service
+	 */
 	private POA rootPOA() throws ServiceException {
 		if (this.rootPOA == null) {
 			try {
@@ -160,13 +188,14 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 				try {
 					obj = ns.bind_new_context(name);
 				} catch (AlreadyBound e) {
+					// Directory already exists, we just have to get the corresponding naming context
 					obj = null;
 				} catch (UserException | SystemException e) {
 					throw new ServiceException("Failed to create services directory", e);
 				}
 			}
 			
-			try{
+			try {
 				if (obj == null) obj = ns.resolve(name);
 				this.serviceDir = NamingContextExtHelper.narrow(obj);
 			} catch (UserException | SystemException e) {
@@ -248,7 +277,7 @@ public class ServiceDirectory<T extends org.omg.CORBA.Object> {
 	 *    predicate to filter services
 	 *
 	 * @throws ServiceException
-	 *    if a CORBA-related error occurs during ope
+	 *    if a CORBA-related error occurs during operation
 	 */
 	public void unbindAll(NameFilter filter) throws ServiceException {
 		for (Name name : this.serviceNames()) {

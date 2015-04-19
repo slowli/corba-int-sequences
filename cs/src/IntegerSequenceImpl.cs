@@ -41,7 +41,6 @@ namespace demo.impl {
 
 				return this.Compute(index);
 			} catch (Exception e) {
-				Console.WriteLine(e.Message);
 				Response res = new Response();
 				res.Setmessage(e.Message);
 				return res;
